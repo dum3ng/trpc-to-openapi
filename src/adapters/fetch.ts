@@ -87,7 +87,10 @@ export const createOpenApiFetchHandler = async <TRouter extends OpenApiRouter>(
   opts: CreateOpenApiFetchHandlerOptions<TRouter>,
 ): Promise<Response> => {
   const resHeaders = new Headers();
-  const url = new URL(opts.req.url.replace(opts.endpoint, ''));
+  const originUrl = new URL(opts.req.url);
+  const path = opts.req.url.substring(originUrl.origin.length);
+  const replaced = path.replace(new RegExp(`^${opts.endpoint}`), '');
+  const url = new URL(`${originUrl.origin}${replaced}`);
   const req: Request = await createRequestProxy(opts.req, url.toString());
 
   const createContext = () => {
